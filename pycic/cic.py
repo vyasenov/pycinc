@@ -28,7 +28,7 @@ class ChangesInChanges:
     
     Parameters
     ----------
-    n_quantiles : int, default=100
+    n_quantiles : int, default=50
         Number of quantiles to use for estimation. Higher values provide
         more granular estimates but may be computationally intensive.
     
@@ -50,7 +50,7 @@ class ChangesInChanges:
     nonlinear difference-in-differences models. Econometrica, 74(2), 431-497.
     """
     
-    def __init__(self, n_quantiles: int = 100, random_state: Optional[int] = None):
+    def __init__(self, n_quantiles: int = 50, random_state: Optional[int] = None):
         self.n_quantiles = n_quantiles
         self.random_state = random_state
         self.results = None
@@ -63,13 +63,12 @@ class ChangesInChanges:
             data: pd.DataFrame,
             outcome: str,
             group: str,
-            period: str,
-            control_group: str = 'control',
-            treatment_group: str = 'treatment',
-            before_period: str = 'before',
-            after_period: str = 'after') -> CiCResults:
+            period: str) -> CiCResults:
         """
         Fit the Changes-in-Changes model.
+        
+        Assumes: group=0 for control, group=1 for treatment
+                 period=0 for before, period=1 for after
         
         Parameters
         ----------
@@ -80,22 +79,10 @@ class ChangesInChanges:
             Name of the outcome variable column.
         
         group : str
-            Name of the group variable column (treatment/control).
+            Name of the group variable column (0=control, 1=treatment).
         
         period : str
-            Name of the period variable column (before/after).
-        
-        control_group : str, default='control'
-            Value indicating the control group.
-        
-        treatment_group : str, default='treatment'
-            Value indicating the treatment group.
-        
-        before_period : str, default='before'
-            Value indicating the before period.
-        
-        after_period : str, default='after'
-            Value indicating the after period.
+            Name of the period variable column (0=before, 1=after).
         
         Returns
         -------
@@ -108,22 +95,16 @@ class ChangesInChanges:
             If data validation fails or required columns are missing.
         """
         # Validate input data
-        self._validate_data(data, outcome, group, period, 
-                     control_group, treatment_group, 
-                     before_period, after_period)
+        self._validate_data(data, outcome, group, period)
         
         # Store processed data
         self.data = data.copy()
         
-        # Extract the four groups
-        y_cb = data[(data[group] == control_group) & 
-                   (data[period] == before_period)][outcome].values
-        y_ca = data[(data[group] == control_group) & 
-                   (data[period] == after_period)][outcome].values
-        y_tb = data[(data[group] == treatment_group) & 
-                   (data[period] == before_period)][outcome].values
-        y_ta = data[(data[group] == treatment_group) & 
-                   (data[period] == after_period)][outcome].values
+        # Extract the four groups using numeric values
+        y_cb = data[(data[group] == 0) & (data[period] == 0)][outcome].values
+        y_ca = data[(data[group] == 0) & (data[period] == 1)][outcome].values
+        y_tb = data[(data[group] == 1) & (data[period] == 0)][outcome].values
+        y_ta = data[(data[group] == 1) & (data[period] == 1)][outcome].values
         
         # Compute quantiles
         quantiles = np.linspace(0, 1, self.n_quantiles)
@@ -147,11 +128,7 @@ class ChangesInChanges:
             data_info={
                 'outcome': outcome,
                 'group': group,
-                'period': period,
-                'control_group': control_group,
-                'treatment_group': treatment_group,
-                'before_period': before_period,
-                'after_period': after_period
+                'period': period
             }
         )
         
@@ -300,10 +277,6 @@ class ChangesInChanges:
         outcome = self.results.data_info['outcome']
         group = self.results.data_info['group']
         period = self.results.data_info['period']
-        control_group = self.results.data_info['control_group']
-        treatment_group = self.results.data_info['treatment_group']
-        before_period = self.results.data_info['before_period']
-        after_period = self.results.data_info['after_period']
         
         # Bootstrap samples
         bootstrap_effects = []
@@ -315,8 +288,7 @@ class ChangesInChanges:
             # Fit model on bootstrap sample
             bootstrap_cic = ChangesInChanges(n_quantiles=self.n_quantiles)
             bootstrap_results = bootstrap_cic.fit(
-                bootstrap_data, outcome, group, period,
-                control_group, treatment_group, before_period, after_period
+                bootstrap_data, outcome, group, period
             )
             
             bootstrap_effects.append(bootstrap_results.treatment_effects)
@@ -333,7 +305,7 @@ class ChangesInChanges:
         
         return lower_bound, upper_bound 
 
-    def _validate_data(self, data, outcome, group, period, control_group, treatment_group, before_period, after_period):
+    def _validate_data(self, data, outcome, group, period):
         required_columns = [outcome, group, period]
         missing_columns = [col for col in required_columns if col not in data.columns]
         if missing_columns:
@@ -345,14 +317,10 @@ class ChangesInChanges:
             raise ValueError(f"Outcome variable '{outcome}' must be numeric")
         unique_groups = data[group].unique()
         unique_periods = data[period].unique()
-        if control_group not in unique_groups:
-            raise ValueError(f"Control group '{control_group}' not found in group column")
-        if treatment_group not in unique_groups:
-            raise ValueError(f"Treatment group '{treatment_group}' not found in group column")
-        if before_period not in unique_periods:
-            raise ValueError(f"Before period '{before_period}' not found in period column")
-        if after_period not in unique_periods:
-            raise ValueError(f"After period '{after_period}' not found in period column")
+        if len(unique_groups) != 2 or not set(unique_groups) == {0, 1}:
+            raise ValueError("Group column must contain only 0 and 1")
+        if len(unique_periods) != 2 or not set(unique_periods) == {0, 1}:
+            raise ValueError("Period column must contain only 0 and 1")
 
     @staticmethod
     def _compute_quantiles(data, quantiles):

@@ -111,49 +111,10 @@ class CiCResults:
         summary_lines.append("=" * 60)
         summary_lines.append("")
         
-        # Data information
-        summary_lines.append("Data Information:")
-        summary_lines.append(f"  Outcome variable: {self.data_info['outcome']}")
-        summary_lines.append(f"  Group variable: {self.data_info['group']}")
-        summary_lines.append(f"  Period variable: {self.data_info['period']}")
-        summary_lines.append(f"  Control group: {self.data_info['control_group']}")
-        summary_lines.append(f"  Treatment group: {self.data_info['treatment_group']}")
-        summary_lines.append(f"  Before period: {self.data_info['before_period']}")
-        summary_lines.append(f"  After period: {self.data_info['after_period']}")
-        summary_lines.append("")
-        
-        # Sample sizes
-        summary_lines.append("Sample Sizes:")
-        summary_lines.append(f"  Control before: {len(self.observed_control_before)}")
-        summary_lines.append(f"  Control after: {len(self.observed_control_after)}")
-        summary_lines.append(f"  Treatment before: {len(self.observed_treatment_before)}")
-        summary_lines.append(f"  Treatment after: {len(self.observed_treatment_after)}")
-        summary_lines.append("")
-        
-        # Treatment effect summary
-        summary_lines.append("Treatment Effect Summary:")
-        summary_lines.append(f"  Mean treatment effect: {self.mean_treatment_effect:.4f}")
-        summary_lines.append(f"  Median treatment effect: {self.median_treatment_effect:.4f}")
-        summary_lines.append(f"  Standard deviation: {self.std_treatment_effect:.4f}")
-        summary_lines.append(f"  Minimum effect: {self.min_treatment_effect:.4f}")
-        summary_lines.append(f"  Maximum effect: {self.max_treatment_effect:.4f}")
-        summary_lines.append("")
-        
         # Treatment effects at key quantiles
         summary_lines.append("Treatment Effects at Key Quantiles:")
         for quantile_name, effect in self.key_quantile_effects.items():
             summary_lines.append(f"  {quantile_name}: {effect:.4f}")
-        summary_lines.append("")
-        
-        # Distributional analysis
-        summary_lines.append("Distributional Analysis:")
-        positive_effects = np.sum(self.treatment_effects > 0)
-        negative_effects = np.sum(self.treatment_effects < 0)
-        zero_effects = np.sum(self.treatment_effects == 0)
-        
-        summary_lines.append(f"  Positive effects: {positive_effects}/{len(self.treatment_effects)} ({positive_effects/len(self.treatment_effects):.1%})")
-        summary_lines.append(f"  Negative effects: {negative_effects}/{len(self.treatment_effects)} ({negative_effects/len(self.treatment_effects):.1%})")
-        summary_lines.append(f"  Zero effects: {zero_effects}/{len(self.treatment_effects)} ({zero_effects/len(self.treatment_effects):.1%})")
         summary_lines.append("")
         
         summary_lines.append("=" * 60)
@@ -161,31 +122,10 @@ class CiCResults:
         return "\n".join(summary_lines)
     
     def plot(self, 
-             figsize: tuple = (8, 5),
+             confidence_intervals: Optional[Tuple[np.ndarray, np.ndarray]] = None,
+             figsize: Tuple[int, int] = (10, 6),
              style: str = 'seaborn-v0_8',
-             save_path: str = None) -> None:
-        """
-        Plot treatment effects across quantiles (minimal figure).
-        """
-        plt.style.use(style)
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(self.quantiles, self.treatment_effects, 'b-', linewidth=2)
-        ax.axhline(y=0, color='k', linestyle='--', alpha=0.5)
-        ax.set_xlabel('Quantile')
-        ax.set_ylabel('Treatment Effect')
-        ax.set_title('Treatment Effects Across Quantiles')
-        ax.grid(True, alpha=0.3)
-        plt.tight_layout()
-        if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
-        else:
-            plt.show()
-    
-    def plot_treatment_effects(self, 
-                             confidence_intervals: Optional[Tuple[np.ndarray, np.ndarray]] = None,
-                             figsize: Tuple[int, int] = (10, 6),
-                             style: str = 'seaborn-v0_8',
-                             save_path: Optional[str] = None) -> None:
+             save_path: Optional[str] = None) -> None:
         """
         Plot treatment effects with optional confidence intervals.
         
@@ -246,20 +186,32 @@ class CiCResults:
         else:
             plt.show()
     
-    def to_dataframe(self) -> pd.DataFrame:
+    def to_dataframe(self, 
+                    confidence_intervals: Optional[Tuple[np.ndarray, np.ndarray]] = None) -> pd.DataFrame:
         """
         Convert results to a pandas DataFrame.
+        
+        Parameters
+        ----------
+        confidence_intervals : tuple, optional
+            (lower_bound, upper_bound) arrays for confidence intervals.
         
         Returns
         -------
         pd.DataFrame
-            DataFrame containing quantiles and treatment effects.
+            DataFrame containing quantiles, treatment effects, and optional confidence intervals.
         """
         df = pd.DataFrame({
             'quantile': self.quantiles,
             'treatment_effect': self.treatment_effects,
             'counterfactual': self.counterfactual
         })
+        
+        # Add confidence intervals if provided
+        if confidence_intervals is not None:
+            lower_bound, upper_bound = confidence_intervals
+            df['ci_lower'] = lower_bound
+            df['ci_upper'] = upper_bound
         
         return df
     

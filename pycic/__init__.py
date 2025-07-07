@@ -6,8 +6,6 @@ introduced by Athey and Imbens (2006).
 """
 
 __version__ = "0.1.0"
-__author__ = "Your Name"
-__email__ = "your.email@example.com"
 
 from .cic import ChangesInChanges
 from .results import CiCResults
