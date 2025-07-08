@@ -61,12 +61,7 @@ results.plot()
 
 ## Examples
 
-See the `examples/heterogeneous_effects.py` file for a complete walkthrough demonstrating:
-
-* Heterogeneous treatment effects across the outcome distribution
-* Comparison with traditional difference-in-differences
-* Visualization of quantile treatment effects
-* Bootstrap confidence intervals
+You can find detailed usage examples in the  `examples/` directory.
 
 ## Background
 
@@ -86,7 +81,7 @@ This makes CiC especially useful in applications where policy effects may differ
 
 Let's establish the following mathematical notation:
 
-* $Y_{gt}$ denote the outcome for group $g \in \{0,1\}$ at time $t \in \{0,1\}$, where 1 stands for what you would expect.
+* $Y_{gt}$ denote the outcome for group $g \in \{0,1\}$ at time $t \in \{0,1\}$. Here 1 stands for Treatment and After observations, respectively.
 * $F_{gt}$ denote the cumulative distribution function (CDF) of $Y_{gt}$
 * $Q_{gt}(u) = F_{gt}^{-1}(u)$ be the corresponding quantile function
 * $U \sim \text{Uniform}(0,1)$ represent unobservable rank
@@ -103,10 +98,9 @@ $$
 
 Here's what this equation does:
 
-* $Y_{10}$ is the treated unit's outcome *before* treatment (group 1, time 0). Find where the treated individual ranked in the control group before treatment
-* $F_{00}(Y_{10})$ finds the rank of that pre-treatment outcome in the control group's pre-treatment distribution. See where someone at that same rank ended up in the control group after treatment
-* $Q_{01}(\cdot)$ maps that rank to the control group's *post-treatment* distribution (group 0, time 1). Use that as the counterfactual outcome
-
+* $Y_{10}$ is the treated unit's outcome *before* treatment (group 1, time 0). 
+* $F_{00}(Y_{10})$ finds the rank of that pre-treatment outcome in the control group's pre-treatment distribution. 
+* $Q_{01}(\cdot)$ maps that rank to the control group's *post-treatment* distribution (group 0, time 1). 
 The treatment effect for each treated unit is then:
 
 $$
@@ -117,11 +111,17 @@ Aggregating these effects across quantiles yields the quantile treatment effects
 
 ---
 
+### Intuition
+
+Put simply, the CiC model (i) finds where the treated individual ranked in the control group before treatment, (ii) sees where someone at that same rank ended up in the control group after treatment, and (iii) uses that as the counterfactual outcome.
+
+---
+
 ### Assumptions
 
-The identification strategy relies on the following four assumptions:
+The identification strategy relies on the following four assumptions concerning either the data generating process or the joint distribution of $(Y,G,T)$.:
 
-1. Model: The outcome in absence of intervention can be expressed as $Y_0=h(U,T)$ for some function $h(\cdot)$. The assumptions below place restrictions either on $h(\cdot)$ or on the joint distribution of $(Y,G,T)$.
+1. Model: The outcome in absence of intervention can be expressed as $Y_0=h(U,T)$ for some function $h(\cdot)$.
 2. Monotonicity: The outcome variable $Y$ is strictly increasing in unobserved heterogeneity $U$. This ensures $h(\cdot)$ is invertible in $U$.
 3. Time-invariant unobservables: The distribution of unobserved factors $U$ is stable over time within each group, $U\perp T \mid G$. This is indeed the main assumption, requiring difference between units in both groups be stable over time.
 4. Common support: The supports of outcome distributions overlap across groups and time periods.
@@ -136,7 +136,7 @@ Because the CiC estimator involves nonparametric transformations of empirical di
 
 1. Re-sample observations with replacement within each group × time cell.
 2. Recompute the CiC estimator on each bootstrap sample.
-3. Use the empirical distribution of bootstrap estimates to form percentile or bias-corrected intervals.
+3. Use the empirical distribution of bootstrap estimates to form percentile intervals.
 
 This ensures robust inference for both point estimates and quantile treatment effects.
 

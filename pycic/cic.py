@@ -254,7 +254,7 @@ class ChangesInChanges:
         
         for _ in range(n_bootstrap):
             # Sample with replacement from each group separately
-            bootstrap_data = self._stratified_bootstrap_sample(self.data, group, period)
+            bootstrap_data = self._bootstrap_sample(self.data, group, period)
             
             # Fit model on bootstrap sample
             bootstrap_cic = ChangesInChanges(n_quantiles=self.n_quantiles)
@@ -274,9 +274,23 @@ class ChangesInChanges:
         
         return lower_bound, upper_bound
 
-    def _stratified_bootstrap_sample(self, data, group, period):
+    def _bootstrap_sample(self, data, group, period):
         """
         Create bootstrap sample maintaining group structure.
+        
+        Parameters
+        ----------
+        data : pd.DataFrame
+            Original data.
+        group : str
+            Name of the group column.
+        period : str
+            Name of the period column.
+        
+        Returns
+        -------
+        pd.DataFrame
+            Bootstrap sample with same group sizes as original data.
         """
         bootstrap_parts = []
         
@@ -307,47 +321,3 @@ class ChangesInChanges:
             raise ValueError("Group column must contain only 0 and 1")
         if len(unique_periods) != 2 or not set(unique_periods) == {0, 1}:
             raise ValueError("Period column must contain only 0 and 1")
-
-    @staticmethod
-    def _compute_quantiles(individual_effects, quantiles):
-        return np.percentile(individual_effects, quantiles * 100)
-
-    @staticmethod
-    def _bootstrap_sample(data, group, period):
-        """
-        Bootstrap sample while maintaining the same group sizes as the original data.
-        
-        Parameters
-        ----------
-        data : pd.DataFrame
-            Original data.
-        group : str
-            Name of the group column.
-        period : str
-            Name of the period column.
-        
-        Returns
-        -------
-        pd.DataFrame
-            Bootstrap sample with same group sizes as original data.
-        """
-        # Get original group sizes
-        original_sizes = data.groupby([group, period]).size()
-        
-        # Sample within each group-period combination
-        bootstrap_samples = []
-        
-        for (g, p), size in original_sizes.items():
-            # Get data for this group-period combination
-            group_data = data[(data[group] == g) & (data[period] == p)]
-            
-            # Sample with replacement within this group
-            indices = np.random.choice(len(group_data), size=size, replace=True)
-            bootstrap_group = group_data.iloc[indices].reset_index(drop=True)
-            
-            bootstrap_samples.append(bootstrap_group)
-        
-        # Combine all samples
-        bootstrap_data = pd.concat(bootstrap_samples, ignore_index=True)
-        
-        return bootstrap_data 

@@ -76,25 +76,19 @@ class CiCResults:
     
     def _compute_summary_stats(self):
         """Compute summary statistics for the results."""
-        # Mean treatment effect
+        # Basic stats
         self.mean_treatment_effect = np.mean(self.treatment_effects)
-        
-        # Median treatment effect
         self.median_treatment_effect = np.median(self.treatment_effects)
-        
+        self.std_treatment_effect = np.std(self.treatment_effects)
+        self.min_treatment_effect = np.min(self.treatment_effects)
+        self.max_treatment_effect = np.max(self.treatment_effects)
+
         # Treatment effects at key quantiles
         key_quantiles = [0.1, 0.25, 0.5, 0.75, 0.9]
         self.key_quantile_effects = {}
         for q in key_quantiles:
             idx = np.argmin(np.abs(self.quantiles - q))
             self.key_quantile_effects[f'q{q:.0%}'] = self.treatment_effects[idx]
-        
-        # Standard deviation of treatment effects
-        self.std_treatment_effect = np.std(self.treatment_effects)
-        
-        # Range of treatment effects
-        self.min_treatment_effect = np.min(self.treatment_effects)
-        self.max_treatment_effect = np.max(self.treatment_effects)
     
     def summary(self) -> str:
         """
