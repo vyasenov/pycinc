@@ -112,7 +112,7 @@ def main():
     
     # Reorder columns for better presentation
     results_df = results_df[['quantile', 'quantile_label', 'treatment_effect', 
-                            'ci_lower', 'ci_upper', 'counterfactual']]
+                            'ci_lower', 'ci_upper', 'counterfactual_quantile']]
     
     # Save main results to CSV
     results_df.to_csv('examples/results.csv', index=False)

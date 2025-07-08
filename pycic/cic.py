@@ -163,21 +163,27 @@ class ChangesInChanges:
         Returns
         -------
         np.ndarray
-            Counterfactual outcomes for the treatment group.
+            Counterfactual outcomes at each quantile.
         """
-        # Compute quantiles for each group
-        q_cb = self._compute_quantiles(y_cb, quantiles)
-        q_ca = self._compute_quantiles(y_ca, quantiles)
-        q_tb = self._compute_quantiles(y_tb, quantiles)
+        # Compute quantiles of treatment group before
+        q_tb = np.percentile(y_tb, quantiles * 100)
         
-        # Estimate the transformation function from control group
-        # This maps from before to after in the control group
-        transformation = q_ca - q_cb
+        # For each quantile of treatment group before, find corresponding quantile in control group after
+        counterfactual = []
         
-        # Apply this transformation to the treatment group's before distribution
-        counterfactual = q_tb + transformation
+        for q_val in q_tb:
+            # Find rank in control group before
+            rank = stats.percentileofscore(y_cb, q_val, kind='weak') / 100
+            
+            # Ensure rank is within valid bounds
+            rank = np.clip(rank, 0.001, 0.999)  # Avoid extreme quantiles
+            
+            # Map to control group after
+            cf_val = np.percentile(y_ca, rank * 100)
+            counterfactual.append(cf_val)
         
-        return counterfactual
+        return np.array(counterfactual)
+        
     
     def _compute_treatment_effects(self,
                                  y_ta: np.ndarray,
@@ -203,49 +209,19 @@ class ChangesInChanges:
             Treatment effects at each quantile.
         """
         # Compute quantiles of observed treatment outcomes
-        q_ta = self._compute_quantiles(y_ta, quantiles)
+        q_ta = np.percentile(y_ta, quantiles * 100)
         
-        # Treatment effect is the difference between observed and counterfactual
-        treatment_effects = q_ta - counterfactual
+        # Compute quantiles of counterfactual outcomes
+        q_counterfactual = np.percentile(counterfactual, quantiles * 100)
         
-        return treatment_effects
-    
-    def predict_quantiles(self, quantiles: np.ndarray) -> np.ndarray:
-        """
-        Predict treatment effects at specific quantiles.
-        
-        Parameters
-        ----------
-        quantiles : np.ndarray
-            Quantiles at which to predict treatment effects.
-            Must be between 0 and 1.
-        
-        Returns
-        -------
-        np.ndarray
-            Predicted treatment effects at the specified quantiles.
-        
-        Raises
-        ------
-        ValueError
-            If model hasn't been fitted yet.
-        """
-        if self.results is None:
-            raise ValueError("Model must be fitted before making predictions.")
-        
-        if not np.all((quantiles >= 0) & (quantiles <= 1)):
-            raise ValueError("Quantiles must be between 0 and 1.")
-        
-        # Interpolate from the fitted quantiles
-        treatment_effects = np.interp(quantiles, 
-                                    self.results.quantiles, 
-                                    self.results.treatment_effects)
+        # Treatment effect is the difference between observed and counterfactual quantiles
+        treatment_effects = q_ta - q_counterfactual
         
         return treatment_effects
     
     def bootstrap_ci(self, 
-                    n_bootstrap: int = 1000,
-                    confidence_level: float = 0.95) -> Tuple[np.ndarray, np.ndarray]:
+                n_bootstrap: int = 1000,
+                confidence_level: float = 0.95) -> Tuple[np.ndarray, np.ndarray]:
         """
         Compute bootstrap confidence intervals for treatment effects.
         
@@ -261,11 +237,6 @@ class ChangesInChanges:
         -------
         tuple
             (lower_bound, upper_bound) arrays for each quantile.
-        
-        Raises
-        ------
-        ValueError
-            If model hasn't been fitted yet.
         """
         if self.results is None:
             raise ValueError("Model must be fitted before computing confidence intervals.")
@@ -282,14 +253,12 @@ class ChangesInChanges:
         bootstrap_effects = []
         
         for _ in range(n_bootstrap):
-            # Sample with replacement
-            bootstrap_data = self._bootstrap_sample(self.data)
+            # Sample with replacement from each group separately
+            bootstrap_data = self._stratified_bootstrap_sample(self.data, group, period)
             
             # Fit model on bootstrap sample
             bootstrap_cic = ChangesInChanges(n_quantiles=self.n_quantiles)
-            bootstrap_results = bootstrap_cic.fit(
-                bootstrap_data, outcome, group, period
-            )
+            bootstrap_results = bootstrap_cic.fit(bootstrap_data, outcome, group, period)
             
             bootstrap_effects.append(bootstrap_results.treatment_effects)
         
@@ -303,7 +272,24 @@ class ChangesInChanges:
         lower_bound = np.percentile(bootstrap_effects, lower_percentile, axis=0)
         upper_bound = np.percentile(bootstrap_effects, upper_percentile, axis=0)
         
-        return lower_bound, upper_bound 
+        return lower_bound, upper_bound
+
+    def _stratified_bootstrap_sample(self, data, group, period):
+        """
+        Create bootstrap sample maintaining group structure.
+        """
+        bootstrap_parts = []
+        
+        # Sample from each of the four groups separately
+        for g in [0, 1]:
+            for p in [0, 1]:
+                group_data = data[(data[group] == g) & (data[period] == p)]
+                n = len(group_data)
+                if n > 0:
+                    indices = np.random.choice(n, size=n, replace=True)
+                    bootstrap_parts.append(group_data.iloc[indices])
+        
+        return pd.concat(bootstrap_parts, ignore_index=True)
 
     def _validate_data(self, data, outcome, group, period):
         required_columns = [outcome, group, period]
@@ -323,13 +309,45 @@ class ChangesInChanges:
             raise ValueError("Period column must contain only 0 and 1")
 
     @staticmethod
-    def _compute_quantiles(data, quantiles):
-        if len(data) == 0:
-            raise ValueError("Cannot compute quantiles of empty array")
-        return np.percentile(data, quantiles * 100)
+    def _compute_quantiles(individual_effects, quantiles):
+        return np.percentile(individual_effects, quantiles * 100)
 
     @staticmethod
-    def _bootstrap_sample(data):
-        n = len(data)
-        indices = np.random.choice(n, size=n, replace=True)
-        return data.iloc[indices].reset_index(drop=True) 
+    def _bootstrap_sample(data, group, period):
+        """
+        Bootstrap sample while maintaining the same group sizes as the original data.
+        
+        Parameters
+        ----------
+        data : pd.DataFrame
+            Original data.
+        group : str
+            Name of the group column.
+        period : str
+            Name of the period column.
+        
+        Returns
+        -------
+        pd.DataFrame
+            Bootstrap sample with same group sizes as original data.
+        """
+        # Get original group sizes
+        original_sizes = data.groupby([group, period]).size()
+        
+        # Sample within each group-period combination
+        bootstrap_samples = []
+        
+        for (g, p), size in original_sizes.items():
+            # Get data for this group-period combination
+            group_data = data[(data[group] == g) & (data[period] == p)]
+            
+            # Sample with replacement within this group
+            indices = np.random.choice(len(group_data), size=size, replace=True)
+            bootstrap_group = group_data.iloc[indices].reset_index(drop=True)
+            
+            bootstrap_samples.append(bootstrap_group)
+        
+        # Combine all samples
+        bootstrap_data = pd.concat(bootstrap_samples, ignore_index=True)
+        
+        return bootstrap_data 

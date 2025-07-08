@@ -204,7 +204,7 @@ class CiCResults:
         df = pd.DataFrame({
             'quantile': self.quantiles,
             'treatment_effect': self.treatment_effects,
-            'counterfactual': self.counterfactual
+            'counterfactual_quantile': self.counterfactual
         })
         
         # Add confidence intervals if provided
