@@ -92,7 +92,9 @@ Let's establish the following mathematical notation:
 
 Athey and Imbens showed that the counterfactual (unobserved) outcome for a treated individual at time 1 (had they not been treated) can be computed as:
 
-$$\tilde{Y}_{11}= Q_{01}(F_{00}(Y_{10}))$$
+$$
+\tau = Y_{11}^{\text{obs}} - \tilde{Y}_{11}^{\text{c.f.}}
+$$
 
 Here's what this equation does:
 
