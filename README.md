@@ -1,4 +1,4 @@
-# pycic
+# pycinc
 
 A Python package for estimating Changes-in-Changes (CiC) models, as introduced by Athey and Imbens (2006). This approach generalizes standard difference-in-differences (DiD) methods and allows for nonlinear and heterogeneous effects across the outcome distribution.
 
@@ -7,7 +7,7 @@ A Python package for estimating Changes-in-Changes (CiC) models, as introduced b
 Install the package using pip:
 
 ```bash
-pip install pycic
+pip install pycinc
 ````
 
 ## Features
@@ -24,7 +24,7 @@ pip install pycic
 ```python
 import numpy as np
 import pandas as pd
-from pycic import ChangesInChanges
+from pycinc import ChangesInChanges
 
 # Generate synthetic data
 np.random.seed(1988)
@@ -153,11 +153,11 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 To cite this package in publications, use the following BibTeX entry:
 
 ```bibtex
-@misc{yasenov2025pycic,
+@misc{yasenov2025pycinc,
   author       = {Vasco Yasenov},
-  title        = {pycic: Python Implementation of the Changes-in-Changes Estimator},
+  title        = {pycinc: Python Implementation of the Changes-in-Changes Estimator},
   year         = {2025},
-  howpublished = {\url{https://github.com/vyasenov/pycic}},
+  howpublished = {\url{https://github.com/vyasenov/pycinc}},
   note         = {Version 0.1.0}
 }
 ```

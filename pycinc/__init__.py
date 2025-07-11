@@ -1,5 +1,5 @@
 """
-PyCIC: Changes-in-Changes Model Implementation
+PyCINC: Changes-in-Changes Model Implementation
 
 A Python package for estimating the Changes-in-Changes (CiC) model 
 introduced by Athey and Imbens (2006).

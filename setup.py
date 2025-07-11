@@ -4,14 +4,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="pycic",
+    name="pycinc",
     version="0.1.0",
     author="Vasco Yasenov",
     author_email="yasenov@gmail.com",
     description="A Python package for estimating the Changes-in-Changes model of Athey and Imbens (2006)",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/pycic",
+    url="https://github.com/yourusername/pycinc",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

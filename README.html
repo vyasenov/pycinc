@@ -111,13 +111,13 @@ window.Quarto = {
 
 
 
-<section id="pycic" class="level1">
-<h1>pycic</h1>
+<section id="pycinc" class="level1">
+<h1>pycinc</h1>
 <p>A Python package for estimating Changes-in-Changes (CiC) models, as introduced by Athey and Imbens (2006). This approach generalizes standard difference-in-differences (DiD) methods and allows for nonlinear and heterogeneous effects across the outcome distribution.</p>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>Install the package using pip:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pycic</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install pycinc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="features" class="level2">
 <h2 class="anchored" data-anchor-id="features">Features</h2>
@@ -134,7 +134,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pycic <span class="im">import</span> ChangesInChanges</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pycinc <span class="im">import</span> ChangesInChanges</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate synthetic data</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">1988</span>)</span>
@@ -255,11 +255,11 @@ window.Quarto = {
 <section id="citation" class="level2">
 <h2 class="anchored" data-anchor-id="citation">Citation</h2>
 <p>To cite this package in publications, use the following BibTeX entry:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">yasenov2025pycic</span>,</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">yasenov2025pycinc</span>,</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Vasco Yasenov},</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {pycic: Python Implementation of the Changes-in-Changes Estimator},</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {pycinc: Python Implementation of the Changes-in-Changes Estimator},</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2025},</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {<span class="ch">\url</span>{https://github.com/vyasenov/pycic}},</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {<span class="ch">\url</span>{https://github.com/vyasenov/pycinc}},</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">note</span>         = {Version 0.1.0}</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>

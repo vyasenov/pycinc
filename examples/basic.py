@@ -5,14 +5,14 @@ This example demonstrates the core functionality of the CiC model
 with minimal setup and output.
 """
 
-# Add parent directory to path to import pycic
+# Add parent directory to path to import pycinc
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 import pandas as pd
-from pycic import ChangesInChanges
+from pycinc import ChangesInChanges
 
 # Set random seed for reproducibility
 np.random.seed(1988)

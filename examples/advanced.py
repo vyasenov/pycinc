@@ -5,7 +5,7 @@ This example demonstrates heterogeneous treatment effects, bootstrap confidence 
 visualization, and exporting results to spreadsheet format.
 """
 
-# Add parent directory to path to import pycic
+# Add parent directory to path to import pycinc
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pycic import ChangesInChanges
+from pycinc import ChangesInChanges
 
 # Set random seed for reproducibility
 np.random.seed(1988)
