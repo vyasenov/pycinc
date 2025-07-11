@@ -93,7 +93,7 @@ Let's establish the following mathematical notation:
 Athey and Imbens showed that the counterfactual (unobserved) outcome for a treated individual at time 1 (had they not been treated) can be computed as:
 
 $$
-Y_{11} = Q_{01}(F_{00}(Y_{10}))
+\hat{Y}_{11} = Q_{01}(F_{00}(Y_{10}))
 $$
 
 Here's what this equation does:
@@ -104,7 +104,7 @@ Here's what this equation does:
 The treatment effect for each treated unit is then:
 
 $$
-\tau = Y_{11}^{\text{obs}} - \tilde{Y}_{11}
+\tau = Y_{11}^{\text{obs}} - \hat{Y}_{11}
 $$
 
 Aggregating these effects across quantiles yields the quantile treatment effects (QTEs), allowing you to estimate how treatment affects different parts of the outcome distribution. 
