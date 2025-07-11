@@ -15,6 +15,7 @@ downloads/
 papers/
 eggs/
 .eggs/
+README_files/
 lib/
 lib64/
 parts/
