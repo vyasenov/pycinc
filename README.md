@@ -102,7 +102,7 @@ Here's what this equation does:
 The treatment effect for each treated unit is then:
 
 $$
-\tau_i = Y_{11,i}^{\text{obs}} - \tilde{Y}_{11,i}^{\text{c.f.}}
+\tau = Y_{11}^{\text{obs}} - \tilde{Y}_{11}^{\text{c.f.}}
 $$
 
 Aggregating these effects across quantiles yields the quantile treatment effects (QTEs), allowing you to estimate how treatment affects different parts of the outcome distribution. 
