@@ -1,5 +1,7 @@
 # pycinc
 
+![](https://img.shields.io/badge/license-MIT-green)
+
 A Python package for estimating Changes-in-Changes (CiC) models, as introduced by Athey and Imbens (2006). This approach generalizes standard difference-in-differences (DiD) methods and allows for nonlinear and heterogeneous effects across the outcome distribution.
 
 ## Installation
