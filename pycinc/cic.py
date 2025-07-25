@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from typing import Optional, Tuple, Dict, Any
-import warnings
 
 from .results import CiCResults
 

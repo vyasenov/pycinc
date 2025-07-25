@@ -5,13 +5,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pycinc",
-    version="0.1.0",
+    version="0.2.0",
     author="Vasco Yasenov",
     author_email="yasenov@gmail.com",
     description="A Python package for estimating the Changes-in-Changes model of Athey and Imbens (2006)",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/pycinc",
+    url="https://github.com/vyasenov/pycinc",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",

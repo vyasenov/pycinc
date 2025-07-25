@@ -8,10 +8,7 @@ the results from fitting the Changes-in-Changes model.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from typing import Dict, Any, Optional, Tuple
-from scipy import stats
-
 
 class CiCResults:
     """
